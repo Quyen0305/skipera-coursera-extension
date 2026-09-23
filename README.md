@@ -1,101 +1,194 @@
-# Skipera Coursera 1.3 — lưu API key
+# Skipera Coursera
 
-Chuyển từ bản **Skipera 1.1.0** sang JavaScript / Manifest V3 cho Chrome và Edge. Khi sử dụng không cần Python, Anaconda, máy chủ hay lệnh terminal.
+Tiện ích Chrome/Edge sử dụng Manifest V3, chuyển đổi từ [Skipera](https://github.com/serv0id/skipera) 1.1.0 sang JavaScript. Tiện ích điều khiển tác vụ Coursera qua popup và service worker, sử dụng phiên đăng nhập trong trình duyệt. Không cần Python, máy chủ riêng hoặc bước build.
+
+Phiên bản hiện tại: **1.3.0**. Đây là dự án độc lập, không liên kết chính thức với Coursera.
+
+## Chức năng
+
+| Thao tác | Phạm vi xử lý | Yêu cầu AI |
+| --- | --- | --- |
+| **Skip video** | Video bài giảng có loại `lecture` | Không |
+| **Làm bài tập** | Các mục `ungradedAssignment` và `staffGraded` có dạng câu hỏi được hỗ trợ | Gemini hoặc Perplexity |
+| **Dừng tác vụ** | Ngăn các bước tiếp theo của tác vụ đang chạy | Không |
+
+Popup tự nhận khóa học từ URL dạng `https://www.coursera.org/learn/<slug>/...`. Khi có nhiều tab, có thể chọn lại tại **Tùy chọn → Tab Coursera**. API key được lưu riêng theo nhà cung cấp khi người dùng bấm **Lưu API key**.
+
+**Skip video** gửi sự kiện và dữ liệu tiến độ video theo logic của bản Skipera gốc; không phát toàn bộ video trong trình duyệt. **Làm bài tập** có thể lưu và nộp đáp án lên Coursera, không chỉ tạo gợi ý.
+
+## Yêu cầu môi trường
+
+- Chrome hoặc Edge hỗ trợ Manifest V3. Manifest khai báo Chrome tối thiểu **120**; môi trường đã kiểm thử là Chrome for Testing **151**.
+- Tài khoản Coursera đã đăng nhập trong cùng hồ sơ trình duyệt và có quyền truy cập khóa học.
+- Giữ tab `https://www.coursera.org` đã chọn mở trong khi chạy.
+- Để làm bài bằng AI: API key, model khả dụng và hạn mức tại nhà cung cấp tương ứng.
+- Để chạy kiểm thử mã nguồn: Node.js **24** và npm. Người chỉ sử dụng extension không cần Node.js.
 
 ## Cài đặt
 
-1. Nếu dùng ZIP: giải nén toàn bộ vào một thư mục cố định, ví dụ `D:\SkiperaExtension`.
-2. Mở `chrome://extensions` trên Chrome hoặc `edge://extensions` trên Edge.
-3. Bật **Developer mode / Chế độ nhà phát triển**.
-4. Chọn **Load unpacked / Tải tiện ích đã giải nén**.
-5. Chọn thư mục chứa trực tiếp `manifest.json`. Có thể chọn ngay thư mục `outputs\skipera-extension` đã tạo, không cần dùng ZIP.
-6. Ghim **Skipera Coursera** trong menu tiện ích nếu muốn.
+### Lấy mã nguồn
 
-Giữ nguyên thư mục sau khi cài. Khi cập nhật mã, bấm nút **Reload / Tải lại** trên trang quản lý tiện ích.
+Clone repository bằng tài khoản có quyền truy cập:
 
-## Cập nhật từ bản trước
+```bash
+git clone https://github.com/Quyen0305/skipera-coursera-extension.git
+cd skipera-coursera-extension
+```
 
-Nếu đang cài trực tiếp thư mục này, vào `chrome://extensions` hoặc `edge://extensions`, bấm **Reload / Tải lại** ở Skipera. Nếu cài từ thư mục đã giải nén khác, giải nén ZIP mới và thay nội dung ở thư mục đó trước khi Reload. Đóng bảng điều khiển cũ nếu còn mở.
+Hoặc dùng **Code → Download ZIP** trên GitHub và giải nén vào một thư mục cố định.
+
+### Nạp extension
+
+1. Mở `chrome://extensions` hoặc `edge://extensions`.
+2. Bật **Developer mode / Chế độ nhà phát triển**.
+3. Chọn **Load unpacked / Tải tiện ích đã giải nén**.
+4. Chọn thư mục chứa trực tiếp [manifest.json](manifest.json).
+5. Ghim **Skipera Coursera** trên thanh công cụ nếu cần.
+
+Không cần chạy `npm install` hoặc build trước khi nạp. Giữ nguyên thư mục nguồn sau khi cài.
+
+### Cập nhật
+
+Dừng tác vụ hiện tại trước khi cập nhật. Với bản clone từ GitHub, chạy `git pull --ff-only` trong thư mục repository. Với bản ZIP, thay mã nguồn trong thư mục đã cài bằng bản mới. Sau đó bấm **Reload / Tải lại** trên trang quản lý extension.
 
 ## Sử dụng
 
-1. Đăng nhập Coursera và mở khóa học.
-2. Bấm biểu tượng **Skipera**: popup nhỏ xuất hiện ngay dưới biểu tượng, tự nhận và tải khóa học đang mở.
-3. Bấm **Skip video** để chỉ xử lý video, không cần API key.
-4. Hoặc bấm **Làm bài tập** để dùng AI làm và nộp bài. Nhập API key, model và cấp quyền trong **Tùy chọn** trước khi chạy. Mỗi lần chỉ chạy một tác vụ. Có thể đóng popup; giữ tab Coursera mở.
-5. Bấm lại biểu tượng để xem tiến độ hoặc bấm **Dừng tác vụ**. Yêu cầu đã gửi có thể vẫn hoàn tất.
-6. Bấm **Tải** khi muốn cập nhật lại tiến độ. Có thể nhập URL/slug khác; danh sách tab nằm trong **Tùy chọn**.
+1. Đăng nhập Coursera và mở trang khóa học.
+2. Bấm biểu tượng **Skipera**. Popup nhận URL và tải thông tin khóa học khi cần.
+3. Kiểm tra slug. Nếu thay URL hoặc tab, bấm **Tải** để cập nhật dữ liệu.
+4. Chọn **Skip video** hoặc **Làm bài tập**. Mỗi thời điểm chỉ chạy một tác vụ.
+5. Có thể đóng popup; tác vụ tiếp tục trong service worker. Mở lại popup để xem tiến độ, nhật ký hoặc bấm **Dừng tác vụ**.
 
-Tiến độ “Đã hoàn tất” lấy từ Coursera. Nhật ký “đã gửi yêu cầu” không đồng nghĩa đã được xác nhận hoàn tất. Phần Nhật ký và Tùy chọn mặc định thu gọn.
+Bộ đếm **Đã hoàn tất** lấy từ dữ liệu tiến độ của Coursera và tính trên toàn bộ nội dung khóa học. Nhật ký **đã gửi yêu cầu** chỉ xác nhận yêu cầu đã xử lý ở tầng API; không thay thế xác nhận hoàn tất từ Coursera.
 
-Nếu đóng trình duyệt, Reload extension hoặc tác vụ nền bị hệ thống chấm dứt, tác vụ không tự chạy lại. Hãy mở popup, tải lại khóa học và kiểm tra tiến độ trước khi chạy tiếp.
+Dừng tác vụ không hoàn tác yêu cầu đã gửi. Sau khi dừng, bấm **Tải** để đọc lại trạng thái thực tế.
 
-## Hai nút tác vụ
+## Cấu hình AI
 
-| Nút | Phạm vi |
-|---|---|
-| **Skip video** | Chỉ video bài giảng (`lecture`), không cần AI |
-| **Làm bài tập** | Chỉ bài tập (`ungradedAssignment`, `staffGraded`), dùng Gemini / Perplexity để làm và nộp các dạng câu hỏi được hỗ trợ |
+Mở **Tùy chọn**, chọn nhà cung cấp và model, rồi bấm **Cho phép kết nối AI**. Nhập API key và bấm **Lưu API key** nếu muốn dùng lại ở lần mở popup sau.
 
-Nút **Dừng tác vụ** xuất hiện khi đang chạy. Hai nút tác vụ tạm khóa trong lúc tải hoặc xử lý để tránh chạy trùng. Nhật ký cho biết số video và bài tập sẵn sàng.
+| Nhà cung cấp | Model mặc định trong mã | Endpoint |
+| --- | --- | --- |
+| Gemini | `gemini-3.1-flash-lite` | `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` |
+| Perplexity | `sonar-pro` | `https://api.perplexity.ai/v1/sonar` |
 
-Các lựa chọn tác vụ cũ không được dùng bởi hai nút này. Dạng câu hỏi AI được hỗ trợ: một lựa chọn, nhiều lựa chọn, checkbox reflect, text reflect và exact match.
+Tên model có thể chỉnh sửa. Các giá trị mặc định là cấu hình của extension, không bảo đảm model được cấp quyền hoặc còn khả dụng với mọi tài khoản. Lưu key không kiểm tra tính hợp lệ của key; lỗi xác thực được báo khi gọi API.
 
-## AI (tùy chọn)
+### Lượt nộp bài
 
-AI chỉ được gọi khi bấm **Làm bài tập**. **Skip video** không cần API key.
+**Lượt / bài** giới hạn số lần nộp cho mỗi bài tập trong một lần chạy: mặc định **1**, tối đa **3**. Khi điểm dưới mục tiêu **80%**, phần xử lý có thể dùng phản hồi chấm điểm để thực hiện lượt tiếp theo, nếu Coursera cho phép.
 
-1. Mở **Tùy chọn**.
-2. Chọn nhà cung cấp, điền tên model khả dụng với tài khoản và API key của bạn.
-3. Bấm **Cho phép kết nối AI**; trình duyệt chỉ xin quyền truy cập nhà cung cấp được chọn.
-4. Bấm **Làm bài tập**.
+Giới hạn này không cấp thêm lượt của Coursera. Nếu không còn lượt, dạng câu hỏi chưa hỗ trợ hoặc chưa có phản hồi chấm điểm hợp lệ sau khi nộp, extension dừng xử lý bài đó. Mục tiêu 80% không phải cam kết điểm số hoặc điều kiện đạt của mọi khóa học.
 
-Tên model ban đầu giữ theo cấu hình mặc định của bản Python: `gemini-3.1-flash-lite` hoặc `sonar-pro`. Có thể sửa tên model. Bấm **Lưu API key** để lưu riêng cho Gemini hoặc Perplexity trong `chrome.storage.local` của trình duyệt. Mở lại popup sẽ tự điền key đã lưu vào ô mật khẩu. Bấm **Xóa key đã lưu** để xóa key của nhà cung cấp đang chọn. Dữ liệu không đồng bộ lên tài khoản Google/Microsoft và không nằm trong mã nguồn GitHub. Kho lưu trữ extension không mã hóa key; chỉ các trang nội bộ của extension được quyền đọc kho này. Nếu không bấm Lưu, key chỉ tồn tại trong bộ nhớ popup/tác vụ hiện tại.
+### Dạng câu hỏi hỗ trợ
 
-Khi bật AI, đề/các đáp án và phản hồi chấm điểm của lượt trước được gửi trực tiếp đến nhà cung cấp bạn chọn. API có thể tính phí. Bài tập mặc định tối đa một lượt nộp, có thể chọn hai hoặc ba lượt; mục tiêu điểm là 80% như bản gốc. Nếu Coursera chưa trả kết quả chấm, extension dừng bài đó để tránh nộp lặp.
+`MULTIPLE_CHOICE`, `CHECKBOX`, `CHECKBOX_REFLECT`, `TEXT_REFLECT`, `TEXT_EXACT_MATCH`.
 
-## Khác biệt so với bản Python
+Đáp án AI được kiểm tra ID câu hỏi, lựa chọn hợp lệ, số lựa chọn và nội dung bắt buộc trước khi lưu. Phần xử lý không nộp đáp án trống để thay thế một dạng câu hỏi chưa hỗ trợ.
 
-- Dùng phiên đăng nhập ngay trong tab Coursera, không cần đóng trình duyệt để trích xuất cookie.
-- Chạy tuần tự, làm mới tiến độ/khóa bài theo đợt và không gửi lại một mục trong cùng lần chạy.
-- Dừng toàn bộ khi gặp mất kết nối, lỗi xác thực hoặc giới hạn tốc độ HTTP 401/403/429.
-- Không gửi đáp án trống cho loại câu hỏi chưa hỗ trợ; bài đó hiện lỗi để mở thủ công.
-- Giữ phản hồi AI trong bộ nhớ của lần chạy, không chuyển dữ liệu cache `gradedData` từ Python.
-- Popup chỉ điều khiển tác vụ nền; đóng/mở popup không hủy công việc. Khởi động lại trình duyệt hoặc Reload extension sẽ kết thúc tác vụ.
-
-## Dữ liệu và quyền truy cập
-
-- Quyền `scripting`: gửi yêu cầu API trong tab Coursera để dùng đúng phiên đăng nhập và nguồn yêu cầu.
-- Quyền `cookies`: đọc các cookie CSRF của Coursera. Không ghi hay xuất cookie đăng nhập ra file.
-- Quyền `storage`: lưu tùy chọn tác vụ/model trên máy; giữ tiến độ, danh sách nội dung và nhật ký trong bộ nhớ phiên trình duyệt để popup khôi phục trạng thái. API key chỉ được lưu cục bộ khi bạn bấm Lưu; không lưu đáp án AI.
-- Quyền website bắt buộc chỉ có `https://www.coursera.org/*`. Quyền Gemini / Perplexity là tùy chọn.
-- Không có telemetry, backend riêng, mã tải từ xa hay dữ liệu đăng nhập được đóng gói.
-
-## Khi gặp lỗi
-
-- **Không có tab Coursera:** mở trang trên, đăng nhập rồi đóng/mở lại popup.
-- **HTTP 401/403:** kiểm tra đăng nhập hoặc trang xác minh của Coursera, rồi tải lại khóa học.
-- **HTTP 429:** dừng và thử lại sau khi giới hạn của Coursera kết thúc.
-- **Không đọc được khóa học:** kiểm tra slug, quyền đăng ký và mục Nhật ký.
-- **AI HTTP 401/403/404/429:** kiểm tra key, tên model, quyền API và hạn mức nhà cung cấp.
-- **Đã gửi nhưng chưa hoàn tất:** tải lại tiến độ sau; không suy ra thành công chỉ từ mã HTTP.
-- **API/GraphQL thay đổi:** có thể cần cập nhật extension vì các API Coursera này không phải giao diện tích hợp ổn định được bảo đảm.
-
-## Kiểm tra mã
-
-Chỉ người phát triển mới cần Node.js. Không cần cài thư viện để chạy kiểm thử đơn vị:
+## Kiến trúc
 
 ```text
+Popup (runner.html / runner.js)
+    | chrome.runtime.sendMessage: state, load, start, stop
+    v
+Service worker (background.js)
+    | JobController
+    +-- transport.js -- script trong tab Coursera -- Coursera REST / GraphQL
+    +-- assessment.js -- llm.js ------------------- Gemini / Perplexity
+    +-- chrome.storage.session ------------------- trạng thái tác vụ
+```
+
+- **Popup** hiển thị dữ liệu, cấu hình và gửi lệnh; không sở hữu vòng đời tác vụ.
+- **Service worker** nhận lệnh, chặn tác vụ chạy trùng và lưu trạng thái để popup đọc lại.
+- **Transport** thực thi yêu cầu cùng nguồn trong tab Coursera với `credentials: include`; đọc cookie CSRF và gắn header tương ứng. Không trích xuất cookie đăng nhập ra file.
+- **JobController** đọc tiến độ, lọc mục đã hoàn tất hoặc đang khóa, xử lý tuần tự và làm mới dữ liệu sau mỗi đợt. Mỗi mục được thử tối đa một lần trong vòng điều phối; một bài tập có thể có nhiều lượt nộp bên trong lần xử lý đó.
+- **AI client** gửi yêu cầu trực tiếp tới nhà cung cấp được chọn. Không có backend trung gian.
+
+Worker gọi API duy trì hoạt động mỗi 20 giây trong thời gian tác vụ đang chạy và dọn timer khi kết thúc. Đây không phải cơ chế khôi phục công việc bền vững: đóng trình duyệt, reload extension hoặc worker bị hệ thống chấm dứt có thể làm gián đoạn tác vụ. Extension không tự phát lại yêu cầu; cần tải lại tiến độ và chạy lại thủ công.
+
+### Cấu trúc mã nguồn
+
+| File / thư mục | Trách nhiệm |
+| --- | --- |
+| [manifest.json](manifest.json) | Metadata, quyền, popup, service worker và CSP |
+| [runner.html](runner.html), [runner.js](runner.js), [style.css](style.css) | Giao diện popup và cấu hình |
+| [background.js](background.js) | Nhận lệnh, lưu trạng thái, badge và vòng đời worker |
+| [job.js](job.js) | Điều phối tải, chạy và dừng tác vụ |
+| [core.js](core.js) | Chuẩn hóa slug, lọc tiến độ, xác thực đáp án và tác vụ cơ bản |
+| [transport.js](transport.js) | Giao tiếp REST/GraphQL với tab Coursera |
+| [assessment.js](assessment.js) | Đọc câu hỏi, lưu bản nháp, nộp bài và đọc phản hồi |
+| [llm.js](llm.js) | Client Gemini và Perplexity |
+| [queries.js](queries.js), [materials.js](materials.js) | Truy vấn GraphQL và tham số nội dung khóa học |
+| [tests/](tests/) | Kiểm thử bằng `node:test` |
+| [VERIFICATION.md](VERIFICATION.md) | Môi trường, kết quả và giới hạn kiểm chứng |
+
+Mã còn giữ các hàm xử lý bài đọc, Coach, widget/LTI và thảo luận từ bản chuyển đổi trước. Hai nút trong giao diện hiện tại không gọi những loại tác vụ này.
+
+## Quyền và lưu trữ dữ liệu
+
+### Quyền trình duyệt
+
+| Quyền | Mục đích |
+| --- | --- |
+| `storage` | Lưu cấu hình, key do người dùng chọn lưu và trạng thái tác vụ |
+| `scripting` | Thực thi yêu cầu API trong tab Coursera được chọn |
+| `cookies` | Đọc cookie CSRF của Coursera |
+| `https://www.coursera.org/*` | Truy cập tab và API Coursera |
+| `https://generativelanguage.googleapis.com/*` | Quyền tùy chọn cho Gemini |
+| `https://api.perplexity.ai/*` | Quyền tùy chọn cho Perplexity |
+
+### Nơi lưu dữ liệu
+
+| Vị trí | Nội dung | Thời gian lưu |
+| --- | --- | --- |
+| `chrome.storage.local`: `popupPrefs` | Nhà cung cấp, model và số lượt nộp | Qua các phiên trình duyệt |
+| `chrome.storage.local`: `apiKey_gemini`, `apiKey_perplexity` | API key được lưu bằng nút **Lưu API key** | Đến khi xóa key hoặc dữ liệu extension |
+| `chrome.storage.session`: `jobState` | ID người dùng/khóa học, snapshot nội dung, tiến độ và tối đa 100 dòng nhật ký | Bộ nhớ phiên trình duyệt |
+| Bộ nhớ tác vụ | Đề bài, đáp án AI và phản hồi các lượt nộp | Trong lần xử lý hiện tại |
+
+`storage.local` được đặt ở mức `TRUSTED_CONTEXTS` để content script không đọc trực tiếp. Key không được đồng bộ bằng `storage.sync`, không ghi vào nhật ký tác vụ và không nằm trong repository. Extension không tự mã hóa key khi lưu; ô mật khẩu chỉ che nội dung trên giao diện.
+
+**Xóa key đã lưu** chỉ xóa key của nhà cung cấp đang chọn. Nếu không bấm Lưu, key chỉ tồn tại trong bộ nhớ popup và tác vụ đã nhận key.
+
+Khi làm bài, nội dung câu hỏi, lựa chọn và phản hồi lượt trước được gửi tới nhà cung cấp AI đã chọn. API key được gửi trong header xác thực tới nhà cung cấp đó. Extension không có telemetry hoặc dịch vụ thu thập dữ liệu riêng.
+
+## Phát triển và kiểm thử
+
+Mã nguồn dùng ES modules, không có dependency npm được khai báo và không cần bundler.
+
+```bash
 npm test
 ```
 
-Kiểm thử trình duyệt dùng profile tách biệt và dữ liệu Coursera giả lập, không dùng tài khoản thật và không nộp bài thật. Chi tiết kết quả trong `VERIFICATION.md`.
+Lệnh trên chạy `node --test tests/*.test.js`. Bộ kiểm thử hiện có **21 ca**; kết quả đã ghi nhận cho bản 1.3.0 là 21 đạt, 0 lỗi trên Node.js 24.18.0.
 
-## Nguồn
+Phạm vi gồm lọc nội dung, xác thực đáp án, thứ tự sự kiện video, dừng tác vụ, chống chạy trùng, lỗi HTTP/GraphQL và định dạng yêu cầu AI. Kiểm tra giao diện/lưu key dùng Chromium với dữ liệu giả lập; các script trình duyệt của đợt kiểm tra đó chưa được đóng gói trong repository và không chạy bằng `npm test`.
 
-- Mã gốc: [Skipera](https://github.com/serv0id/skipera), MIT; bản chuyển đổi dựa trên mã cài trên máy, giữ giấy phép ở `LICENSE.skipera`.
-- [Chrome: network requests và quyền host](https://developer.chrome.com/docs/extensions/develop/concepts/network-requests).
-- [Gemini: generateContent](https://ai.google.dev/api/generate-content).
-- [Perplexity: Sonar API](https://docs.perplexity.ai/api-reference/sonar-post).
+Chưa xác minh đầu cuối bằng tài khoản Coursera hoặc API key AI thật; chưa kiểm thử trực tiếp trên Edge. Xem [VERIFICATION.md](VERIFICATION.md) trước khi suy rộng kết quả kiểm thử.
 
-Extension này không phải sản phẩm chính thức của Coursera.
+## Xử lý sự cố
+
+| Hiện tượng | Cách kiểm tra |
+| --- | --- |
+| Không nhận khóa học | Mở URL `/learn/<slug>/...`, kiểm tra tab trong Tùy chọn rồi bấm Tải |
+| Coursera HTTP 401/403 | Kiểm tra phiên đăng nhập và trang xác minh trong tab Coursera; tải lại dữ liệu |
+| Coursera HTTP 429 | Chờ giới hạn dịch vụ kết thúc rồi chạy lại |
+| AI HTTP 401/403/404/429 | Kiểm tra key, model, quyền sử dụng và hạn mức của nhà cung cấp |
+| API không trả JSON hoặc tab mất kết nối | Kiểm tra tab Coursera, tải lại tiến độ trước khi thử tiếp |
+| Đã gửi nhưng chưa hoàn tất | Đọc lại tiến độ bằng nút Tải; không suy ra kết quả từ log gửi yêu cầu |
+| Thiếu phản hồi chấm điểm | Kiểm tra kết quả trên Coursera; extension không tự nộp lại khi chưa xác định được kết quả |
+| Tác vụ bị gián đoạn | Giữ tab Coursera mở, tải lại dữ liệu và chạy lại thủ công |
+
+Yêu cầu Coursera có timeout 30 giây; yêu cầu AI có timeout 120 giây. Lỗi kết nối hoặc Coursera HTTP 401/403/429 dừng toàn bộ tác vụ; lỗi riêng của một mục thường được ghi lại rồi chuyển sang mục tiếp theo. Các API Coursera được sử dụng là API nội bộ và có thể thay đổi độc lập với phiên bản extension.
+
+## Đóng góp
+
+Khi sửa mã, giữ quyền truy cập ở mức cần thiết và bổ sung kiểm thử cho thay đổi hành vi. Trước khi gửi thay đổi, chạy `npm test` và kiểm tra popup bằng dữ liệu thử nghiệm. Khi báo lỗi, ghi phiên bản extension/trình duyệt, bước tái hiện và thông báo lỗi; loại bỏ API key, cookie và thông tin tài khoản khỏi log hoặc ảnh chụp.
+
+## Giấy phép và nguồn gốc
+
+Dự án chuyển đổi từ Skipera 1.1.0, sử dụng mã và truy vấn có giấy phép **MIT**. Thông báo bản quyền gốc được giữ trong [LICENSE.skipera](LICENSE.skipera).
+
+- Dự án gốc: [serv0id/skipera](https://github.com/serv0id/skipera).
+- Phiên bản extension được xác định trong [manifest.json](manifest.json) và [package.json](package.json).
