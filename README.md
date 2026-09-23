@@ -4,6 +4,14 @@ Tiện ích Chrome/Edge sử dụng Manifest V3, chuyển đổi từ [Skipera](
 
 Phiên bản hiện tại: **1.3.0**. Đây là dự án độc lập, không liên kết chính thức với Coursera.
 
+## Video hướng dẫn
+
+Video hướng dẫn cài đặt và sử dụng Skipera Coursera, dài **5 phút 23 giây**. Bấm vào ảnh hoặc liên kết bên dưới để xem.
+
+[![Xem video hướng dẫn Skipera Coursera](docs/skipera-demo.jpg)](docs/skipera-demo.mp4)
+
+**[▶ Xem video hướng dẫn](docs/skipera-demo.mp4)**
+
 ## Chức năng
 
 | Thao tác | Phạm vi xử lý | Yêu cầu AI |
