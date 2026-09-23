@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Skipera</title><link rel="stylesheet" href="style.css"></head>
+<body><main>
+<header><div class="brand"><span class="mark">S</span><strong>Skipera</strong></div><span id="state" class="pill">Sẵn sàng</span></header>
+<label for="slug">Khóa học Coursera</label>
+<div class="row"><input id="slug" placeholder="Mở khóa học hoặc nhập URL" autocomplete="off"><button id="load" title="Tải lại khóa học">Tải</button></div>
+<section class="progress-box"><div class="row"><span>Đã hoàn tất</span><strong><span id="completed">—</span> / <span id="total">—</span></strong></div><progress id="progress" value="0" max="1" aria-label="Tiến độ"></progress><p id="current"></p></section>
+<div class="actions"><button id="skipVideo" class="primary" disabled>Skip video</button><button id="doAssignments" class="assignment" disabled>Làm bài tập</button></div>
+<button id="stop" class="full" hidden disabled>Dừng tác vụ</button>
+<p id="notice" role="status">Đang nhận khóa học…</p>
+<details id="options"><summary>Tùy chọn</summary>
+<label for="courseTab">Tab Coursera</label><select id="courseTab"></select>
+<p class="hint">Skip video chỉ xử lý video. Làm bài tập dùng AI để làm và nộp các dạng bài được hỗ trợ.</p>
+<div class="row"><label class="grow" for="provider">Nhà cung cấp<select id="provider"><option value="gemini">Gemini</option><option value="perplexity">Perplexity</option></select></label><label for="attempts">Lượt / bài<select id="attempts"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label></div>
+<label for="model">Model</label><input id="model" value="gemini-3.1-flash-lite" autocomplete="off">
+<button id="allowAI" class="full">Cho phép kết nối AI</button><p id="aiStatus" class="hint"></p>
+<label for="apiKey">API key</label><input id="apiKey" type="password" placeholder="Nhập key rồi bấm Làm bài tập" autocomplete="off">
+<div class="actions"><button id="saveKey">Lưu API key</button><button id="deleteKey">Xóa key đã lưu</button></div>
+<p id="keyStatus" class="hint" role="status"></p>
+<p class="hint">Key lưu riêng cho mỗi nhà cung cấp trên trình duyệt này, không đồng bộ. Bộ nhớ extension không mã hóa key. AI có thể tính phí.</p>
+</details>
+<details><summary>Nhật ký <span id="selected"></span></summary><pre id="log">Chưa có tác vụ.</pre></details>
+<footer>Đóng popup vẫn chạy · Giữ tab Coursera mở</footer>
+</main><script type="module" src="runner.js"></script></body></html>

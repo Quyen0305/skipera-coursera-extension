@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+*.log
+*.zip
+work/
+test-results/
+playwright-report/
+config.json
+*.local.json
